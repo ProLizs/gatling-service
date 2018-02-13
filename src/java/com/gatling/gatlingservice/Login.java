@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.gatling.Listening;
+package com.gatling.gatlingservice;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,18 +13,25 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.gatling.db.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Administrator
  */
-@WebServlet(name = "ListeningServlet", urlPatterns = {"/ListeningServlet"})
-public class ListeningServlet extends HttpServlet {
+@WebServlet(name = "Login", urlPatterns = {"/Login"})
+public class Login extends HttpServlet {
     
     private String message;
+    DBManager dbmgr;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
+        dbmgr = new DBManager();
         message = "Hello World , Nect To Meet You: " + System.currentTimeMillis();
         System.out.println("servlet初始化……");
         super.init();
@@ -51,21 +58,12 @@ public class ListeningServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response, String resultData)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ListeningServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ListeningServlet at " + request.getContextPath() + "</h1>");
-            out.println("<h1>" + message + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            out.println(resultData);
         }
     }
 
@@ -81,11 +79,18 @@ public class ListeningServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        setResponseAccess(response);
+        this.setResponseAccess(response);
         String ac = request.getParameter("account");
         String pw = request.getParameter("password");
         System.out.printf("account:"+ac+"     password:"+pw);
-        processRequest(request, response);
+        ResultSet ret = dbmgr.Execute("SELECT * FROM db_account WHERE account='" + ac + "' AND 'password'='"+pw+"'");
+        try {
+            String status = ret.getMetaData().getColumnLabel(3);
+            System.out.print(status);
+            processRequest(request,response,status);
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -99,7 +104,7 @@ public class ListeningServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        processRequest(request, response,"");
     }
 
     /**
