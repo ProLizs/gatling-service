@@ -3,9 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/NetBeansProjects/gatling-service/web/WEB-INF/web.xml</file>
+            <file>file:/E:/NetBeansProjects/gatling-service/src/java/com/gatling/basedata/Token.java</file>
             <file>file:/E:/NetBeansProjects/gatling-service/src/java/com/gatling/db/DBManager.java</file>
             <file>file:/E:/NetBeansProjects/gatling-service/src/java/com/gatling/gatlingservice/Login.java</file>
+            <file>file:/E:/NetBeansProjects/gatling-service/src/java/com/gatling/basedata/menuData.java</file>
             <file>file:/E:/NetBeansProjects/gatling-service/web/index.xhtml</file>
         </group>
     </open-files>

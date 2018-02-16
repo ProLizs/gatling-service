@@ -18,6 +18,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.gatling.basedata.menuData;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import javax.json.*;
+import com.gatling.basedata.Token;
+import com.google.gson.*;
+
 
 /**
  *
@@ -55,6 +62,7 @@ public class Login extends HttpServlet {
      *
      * @param request servlet request
      * @param response servlet response
+     * @param resultData http responseData
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -63,7 +71,33 @@ public class Login extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println(resultData);
+//            ResultSet ret = dbmgr.Execute("SELECT * FROM `menu_L1` a LEFT JOIN `menu_L2` b ON a.menu_id =  b.menu_id");
+            ResultSet ret = dbmgr.Execute("SELECT * FROM `menu_L1`");
+            ret.last();
+            int rsCounut = ret.getRow();
+            ret.beforeFirst();
+            
+            String str = null;
+            int index = 1;
+            str = "{\"token\":"+resultData + ",";
+            str += "\"menu\":[";
+            while(ret.next()){
+                str += "{";
+                str += "\"menuid\":" + "\""+ ret.getString("menu_id")+"\",";
+                str += "\"menu_name\":" + "\""+ ret.getString("menu_name") +"\"";
+                str += "}";
+                if(index < rsCounut){
+                    str += ",";
+                    index++;
+                }
+            }
+            str += "]}";
+
+            System.out.print(str);
+            
+            out.println(str);
+        } catch (SQLException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -86,8 +120,9 @@ public class Login extends HttpServlet {
         ResultSet ret = dbmgr.Execute("SELECT * FROM db_account WHERE account='" + ac + "' AND 'password'='"+pw+"'");
         try {
             String status = ret.getMetaData().getColumnLabel(3);
-            System.out.print(status);
-            processRequest(request,response,status);
+            if(status != null){
+                processRequest(request,response,resultToken());
+            }
         } catch (SQLException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -117,4 +152,15 @@ public class Login extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    /**
+    * 生成令牌
+    * 
+    * @Param resp
+    * @return
+    */
+   public synchronized static String resultToken() {
+           // 生成令牌
+           String apikey = System.currentTimeMillis() + "";
+           return apikey;
+   }
 }
